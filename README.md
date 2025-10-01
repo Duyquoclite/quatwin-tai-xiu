@@ -30,9 +30,23 @@ Game cờ bạc trực tuyến với giao diện đẹp mắt và hiệu ứng s
 
 ## 🛠️ Công nghệ
 
-- HTML5, CSS3, JavaScript ES6+
-- LocalStorage API
-- CSS Animations & Transitions
+- **Frontend:** HTML5, CSS3, JavaScript ES6+
+- **Backend:** Node.js, Express.js
+- **Database:** JSON files (mỗi user có file riêng)
+- **Authentication:** JWT tokens
+- **UI/UX:** CSS Animations & Transitions
+
+## 📁 Cấu trúc Database
+
+```
+database/
+├── users.json          # Danh sách tài khoản (chung)
+└── games/              # Dữ liệu game của từng user
+    ├── .gitkeep
+    ├── username1.json  # Dữ liệu game của user 1
+    ├── username2.json  # Dữ liệu game của user 2
+    └── ...
+```
 
 ## 📄 License
 

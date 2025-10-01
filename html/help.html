@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trợ giúp - QuấtWin</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <style>
+        :root {
+            --primary: #4ecdc4;
+            --secondary: #44a08d;
+            --accent: #ff6b6b;
+            --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-strong: #ffffff;
+            --text-soft: #e0e0e0;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            min-height: 100vh;
+            color: var(--text-strong);
+        }
+
+        .help-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 100px;
+        }
+
+        .help-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .help-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .help-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-soft);
+            margin-bottom: 40px;
+        }
+
+        .help-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: space-between;
+        }
+
+        .help-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 350px;
+            max-width: 400px;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-content {
+            color: var(--text-soft);
+            line-height: 1.8;
+            font-size: 1.3rem;
+            flex: 1;
+        }
+
+        .rule-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .rule-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .rule-list li:last-child {
+            border-bottom: none;
+        }
+
+        .rule-number {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .rule-text {
+            flex: 1;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .example-box {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .example-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .warning-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning-title {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .contact-info {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+            width: 100%;
+            flex-basis: 100%;
+        }
+
+        .contact-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            margin: 15px 0;
+            font-size: 1.4rem;
+        }
+
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .help-section {
+                flex: 1;
+                min-width: 300px;
+                max-width: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .help-container {
+                padding: 15px;
+                padding-top: 80px;
+            }
+            
+            .help-title {
+                font-size: 3rem;
+            }
+            
+            .help-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .section-content {
+                font-size: 1.1rem;
+            }
+            
+            .help-section {
+                padding: 20px;
+                min-width: 100%;
+                max-width: 100%;
+                flex: 1 1 100%;
+            }
+            
+            .help-content {
+                flex-direction: column;
+            }
+            
+            .contact-title {
+                font-size: 1.6rem;
+            }
+            
+            .contact-item {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar trigger + nav (hidden by default) -->
+    <img id="menuTriggerLogo" src="../stream/logo.png" alt="logo" />
+    <nav class="sidebar-nav hidden">
+        <div class="logo">
+            <h1>QuấtWin</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="../index.html" class="nav-link" id="gameLink">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+                        <circle cx="5" cy="8" r="1"/>
+                        <circle cx="8" cy="8" r="1"/>
+                        <circle cx="11" cy="8" r="1"/>
+                    </svg>
+                    <span>Trò chơi</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="stats.html" class="nav-link">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor" d="M0 0h16v16H0V0zm1 1v14h14V1H1zm2 2h10v1H3V3zm0 2h10v1H3V5zm0 2h7v1H3V7zm0 2h5v1H3V9z"/>
+                    </svg>
+                    <span>Thống kê</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="leaderboard.html" class="nav-link">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+                        <path fill="currentColor" d="M8 2C4.69 2 2 4.69 2 8s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                        <path fill="currentColor" d="M8 4c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                    </svg>
+                    <span>Bảng xếp hạng</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a href="help.html" class="nav-link">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor" d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path fill="currentColor" d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-1.01 1.16-.408.133-.958.304-1.01.832-.01.178.03.347.102.446a.25.25 0 0 0 .192.14h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927-1.01-1.16-.408.133-.958.304-1.01.832-.01.178-.03-.347-.102-.446a.25.25 0 0 0 .192.14H6.5a.25.25 0 0 0-.25.25v.105c0 .718-.273.927-1.01 1.16-.408.133-.958.304-1.01.832-.01.178.03.347.102.446a.25.25 0 0 0 .192.14h.811a.25.25 0 0 0 .25-.25v-.105z"/>
+                    </svg>
+                    <span>Trợ giúp</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" id="logoutLink">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor" d="M6 12c0 .55.45 1 1 1s1-.45 1-1V7h2c.55 0 1-.45 1-1s-.45-1-1-1H8V2c0-.55-.45-1-1-1s-1 .45-1 1v3H4c-.55 0-1 .45-1 1s.45 1 1 1h2v5z"/>
+                    </svg>
+                    <span>Đăng xuất</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">🎲 Trợ giúp QuấtWin</h1>
+            <p class="help-subtitle">Hướng dẫn chi tiết về trò chơi Tài Xỉu</p>
+        </div>
+
+        <div class="help-content">
+            <!-- Luật chơi cơ bản -->
+            <div class="help-section">
+                <h2 class="section-title">
+                    <span>🎯</span>
+                    Luật chơi cơ bản
+                </h2>
+                <div class="section-content">
+                    <p>Tài Xỉu là trò chơi dự đoán kết quả của 3 xúc xắc. Người chơi sẽ đặt cược vào một trong hai cửa:</p>
+                    <ul class="rule-list">
+                        <li>
+                            <div class="rule-number">1</div>
+                            <div class="rule-text">
+                                <span class="highlight">TÀI:</span> Tổng điểm 3 xúc xắc từ 11-18 điểm
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">2</div>
+                            <div class="rule-text">
+                                <span class="highlight">XỈU:</span> Tổng điểm 3 xúc xắc từ 3-10 điểm
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">3</div>
+                            <div class="rule-text">
+                                <span class="highlight">TRÙNG SỐ:</span> Cả 3 xúc xắc có cùng số điểm (1-1-1, 2-2-2, ..., 6-6-6)
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cách chơi -->
+            <div class="help-section">
+                <h2 class="section-title">
+                    <span>🎮</span>
+                    Cách chơi
+                </h2>
+                <div class="section-content">
+                    <ol class="rule-list">
+                        <li>
+                            <div class="rule-number">1</div>
+                            <div class="rule-text">Nhập số tiền cược vào ô "Số tiền cược"</div>
+                        </li>
+                        <li>
+                            <div class="rule-number">2</div>
+                            <div class="rule-text">Chọn cửa TÀI hoặc XỈU</div>
+                        </li>
+                        <li>
+                            <div class="rule-number">3</div>
+                            <div class="rule-text">Nhấn nút "CHƠI" để tung xúc xắc</div>
+                        </li>
+                        <li>
+                            <div class="rule-number">4</div>
+                            <div class="rule-text">Xem kết quả và nhận thưởng nếu thắng</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Tỷ lệ thắng -->
+            <div class="help-section">
+                <h2 class="section-title">
+                    <span>💰</span>
+                    Tỷ lệ thắng
+                </h2>
+                <div class="section-content">
+                    <div class="example-box">
+                        <div class="example-title">Thắng thường:</div>
+                        <p>• TÀI hoặc XỈU: <span class="highlight">x1</span> (bằng số tiền cược)</p>
+                        <p>• Trùng số: <span class="highlight">x3</span> (gấp 3 lần số tiền cược)</p>
+                    </div>
+                    
+                    <div class="example-box">
+                        <div class="example-title">Ví dụ:</div>
+                        <p>• Cược 100,000 VND vào TÀI → Thắng: +100,000 VND</p>
+                        <p>• Cược 100,000 VND vào TÀI → Trùng số: +300,000 VND</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cách nhập tiền cược -->
+            <div class="help-section">
+                <h2 class="section-title">
+                    <span>💵</span>
+                    Cách nhập tiền cược
+                </h2>
+                <div class="section-content">
+                    <p>Bạn có thể nhập số tiền cược theo nhiều cách:</p>
+                    <ul class="rule-list">
+                        <li>
+                            <div class="rule-number">1</div>
+                            <div class="rule-text">
+                                <span class="highlight">Số tiền trực tiếp:</span> 100000, 50000, 25000
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">2</div>
+                            <div class="rule-text">
+                                <span class="highlight">Phần trăm:</span> 10% (10% số dư hiện tại)
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">3</div>
+                            <div class="rule-text">
+                                <span class="highlight">Đơn vị k:</span> 1k = 1,000 VND, 5k = 5,000 VND
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">4</div>
+                            <div class="rule-text">
+                                <span class="highlight">Đơn vị m:</span> 1m = 1,000,000 VND, 2m = 2,000,000 VND
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">5</div>
+                            <div class="rule-text">
+                                <span class="highlight">Đơn vị b:</span> 1b = 1,000,000,000 VND
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tính năng đặc biệt -->
+            <div class="help-section">
+                <h2 class="section-title">
+                    <span>⭐</span>
+                    Tính năng đặc biệt
+                </h2>
+                <div class="section-content">
+                    <ul class="rule-list">
+                        <li>
+                            <div class="rule-number">1</div>
+                            <div class="rule-text">
+                                <span class="highlight">Lưu trữ tự động:</span> Dữ liệu game được lưu tự động sau mỗi ván
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">2</div>
+                            <div class="rule-text">
+                                <span class="highlight">Lịch sử chi tiết:</span> Xem lại tất cả các ván đã chơi
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">3</div>
+                            <div class="rule-text">
+                                <span class="highlight">Thống kê:</span> Theo dõi tỷ lệ thắng, chuỗi thắng/thua
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">4</div>
+                            <div class="rule-text">
+                                <span class="highlight">Bảng xếp hạng:</span> So sánh với người chơi khác
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bảo mật tài khoản -->
+            <div class="help-section">
+                <h2 class="section-title">
+                    <span>🔐</span>
+                    Bảo mật tài khoản
+                </h2>
+                <div class="section-content">
+                    <ul class="rule-list">
+                        <li>
+                            <div class="rule-number">1</div>
+                            <div class="rule-text">
+                                <span class="highlight">Quên mật khẩu:</span> Liên hệ Admin để được hỗ trợ lấy lại
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">2</div>
+                            <div class="rule-text">
+                                <span class="highlight">Bảo mật:</span> Không chia sẻ thông tin tài khoản với người khác
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">3</div>
+                            <div class="rule-text">
+                                <span class="highlight">Đăng xuất:</span> Luôn đăng xuất sau khi chơi xong
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-number">4</div>
+                            <div class="rule-text">
+                                <span class="highlight">Dữ liệu:</span> Được lưu trữ an toàn trên server
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lưu ý quan trọng -->
+            <div class="help-section">
+                <h2 class="section-title">
+                    <span>⚠️</span>
+                    Lưu ý quan trọng
+                </h2>
+                <div class="section-content">
+                    <div class="warning-box">
+                        <div class="warning-title">⚠️ Cảnh báo</div>
+                        <p>• Chơi có trách nhiệm, không nên cược quá mức khả năng tài chính</p>
+                        <p>• Kết quả xúc xắc hoàn toàn ngẫu nhiên, không thể dự đoán chính xác</p>
+                        <p>• Dữ liệu được lưu trữ an toàn trên server</p>
+                        <p>• Nếu quên mật khẩu, vui lòng liên hệ Admin để được hỗ trợ lấy lại</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liên hệ hỗ trợ -->
+            <div class="contact-info">
+                <div class="contact-title">📞 Liên hệ hỗ trợ</div>
+                <div class="contact-item">
+                    <strong>Facebook:</strong> <a href="https://www.facebook.com/duyquocc2.6/" target="_blank">@duyquocc2.6</a>
+                </div>
+                <div class="contact-item">
+                    <strong>Zalo:</strong> <a href="tel:0339182882">0339182882</a>
+                </div>
+                <div class="contact-item">
+                    <strong>Email:</strong> emtenqchanel@gmail.com
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('quatwin_token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // Sidebar toggle functionality
+        const sidebar = document.querySelector('.sidebar-nav');
+        const triggerImg = document.getElementById('menuTriggerLogo');
+        
+        if (triggerImg) {
+            triggerImg.addEventListener('click', () => {
+                if (sidebar?.classList.contains('hidden')) {
+                    sidebar.classList.remove('hidden');
+                } else {
+                    sidebar.classList.add('hidden');
+                }
+            });
+        }
+
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogoutConfirm();
+        });
+
+        function showLogoutConfirm() {
+            const popup = document.createElement('div');
+            popup.className = 'logout-popup';
+            popup.innerHTML = `
+                <div class="logout-content">
+                    <div class="logout-title">🚪 Đăng xuất</div>
+                    <div class="logout-message">Bạn có chắc muốn đăng xuất?</div>
+                    <div class="logout-buttons">
+                        <button class="logout-cancel">Hủy</button>
+                        <button class="logout-confirm">Đăng xuất</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            popup.querySelector('.logout-cancel').addEventListener('click', () => {
+                document.body.removeChild(popup);
+            });
+            
+            popup.querySelector('.logout-confirm').addEventListener('click', () => {
+                localStorage.removeItem('quatwin_token');
+                localStorage.removeItem('quatwin_user');
+                window.location.href = '/login.html';
+            });
+            
+            popup.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    document.body.removeChild(popup);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

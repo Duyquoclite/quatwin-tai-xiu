@@ -1,0 +1,2 @@
+# This file keeps the games directory in git
+# Each user will have their own game data file: {userId}.json

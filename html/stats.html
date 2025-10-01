@@ -147,16 +147,67 @@
                 height: 60vh;
             }
         }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
-        function loadData() {
-            const saved = localStorage.getItem('bomwinGameData');
-            if (!saved) return { history: [], totalGames: 0 };
-            try { return JSON.parse(saved); } catch { return { history: [], totalGames: 0 }; }
+        const API_BASE = '/api';
+        let token = localStorage.getItem('quatwin_token');
+        
+        // Check authentication
+        if (!token) {
+            window.location.href = '/login.html';
         }
-        function makeChart() {
-        const data = loadData();
+
+        async function loadData() {
+            try {
+                // Load game data
+                const gameResponse = await fetch(`${API_BASE}/load-game`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!gameResponse.ok) {
+                    if (gameResponse.status === 401) {
+                        localStorage.removeItem('quatwin_token');
+                        localStorage.removeItem('quatwin_user');
+                        window.location.href = '/login.html';
+                        return { history: [], totalGames: 0 };
+                    }
+                    throw new Error('Failed to load game data');
+                }
+                
+                const gameData = await gameResponse.json();
+                
+                // Load stats
+                const statsResponse = await fetch(`${API_BASE}/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!statsResponse.ok) {
+                    throw new Error('Failed to load stats');
+                }
+                
+                const stats = await statsResponse.json();
+                
+                return {
+                    history: gameData.history || [],
+                    totalGames: stats.totalGames || 0,
+                    totalWins: stats.totalWins || 0,
+                    balance: stats.balance || 0,
+                    totalProfit: stats.totalProfit || 0,
+                    winRate: stats.winRate || 0
+                };
+            } catch (error) {
+                console.error('Error loading data:', error);
+                return { history: [], totalGames: 0 };
+            }
+        }
+        async function makeChart() {
+        const data = await loadData();
         const history = data.history || [];
             // Hiển thị từ phiên nhỏ (cũ) -> phiên lớn (mới)
             const ordered = [...history].reverse();
@@ -164,11 +215,11 @@
             let cum = 0;
             const series = ordered.map(h => cum += (h.amount || 0));
 
-            // metrics
+            // metrics - use API data
             const total = data.totalGames || ordered.length;
             const wins = data.totalWins || ordered.filter(h => h.won).length;
-            const winrate = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
-            const currentBalance = (data.balance !== undefined ? data.balance : 0);
+            const winrate = data.winRate ? data.winRate.toFixed(1) : (total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0');
+            const currentBalance = data.balance || 0;
             const avgBet = ordered.length > 0 ? Math.round(ordered.reduce((s, h) => s + (h.bet || 0), 0) / ordered.length) : 0;
             document.getElementById('mTotal').textContent = total.toLocaleString('vi-VN');
             document.getElementById('mWins').textContent = wins.toLocaleString('vi-VN');
@@ -179,7 +230,7 @@
             const lossesEl = document.getElementById('mLosses');
             if (lossesEl) lossesEl.textContent = losses.toLocaleString('vi-VN');
             // set color for current money based on total profit
-            const totalProfit = (typeof data.totalProfit === 'number') ? data.totalProfit : series.at(-1) || 0;
+            const totalProfit = data.totalProfit || series.at(-1) || 0;
             const curEl = document.getElementById('mCurrentBet');
             if (curEl) {
                 if (totalProfit > 0) { curEl.style.color = '#4CAF50'; curEl.style.textShadow = '0 0 6px rgba(76,175,80,0.35)'; }
@@ -266,6 +317,51 @@
                     sidebar.classList.toggle('hidden');
                 });
             }
+            
+            // logout link in nav menu
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showLogoutConfirm();
+                });
+            }
+
+            // Logout confirmation popup
+            function showLogoutConfirm() {
+                const popup = document.createElement('div');
+                popup.className = 'logout-popup';
+                popup.innerHTML = `
+                    <div class="logout-content">
+                        <div class="logout-title">🚪 Đăng xuất</div>
+                        <div class="logout-message">Bạn có chắc muốn đăng xuất?</div>
+                        <div class="logout-buttons">
+                            <button class="logout-cancel">Hủy</button>
+                            <button class="logout-confirm">Đăng xuất</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(popup);
+                
+                // Add event listeners
+                popup.querySelector('.logout-cancel').addEventListener('click', () => {
+                    document.body.removeChild(popup);
+                });
+                
+                popup.querySelector('.logout-confirm').addEventListener('click', () => {
+                    localStorage.removeItem('quatwin_token');
+                    localStorage.removeItem('quatwin_user');
+                    window.location.href = '/login.html';
+                });
+                
+                // Close on background click
+                popup.addEventListener('click', (e) => {
+                    if (e.target === popup) {
+                        document.body.removeChild(popup);
+                    }
+                });
+            }
         }
         window.addEventListener('DOMContentLoaded', makeChart);
     </script>
@@ -295,6 +391,34 @@
                             d="M0 0h16v16H0V0zm1 1v14h14V1H1zm2 2h10v1H3V3zm0 2h10v1H3V5zm0 2h7v1H3V7zm0 2h5v1H3V9z" />
                     </svg>
                     <span>Thống kê</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="leaderboard.html" class="nav-link">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+                        <path fill="currentColor" d="M8 2C4.69 2 2 4.69 2 8s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                        <path fill="currentColor" d="M8 4c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                    </svg>
+                    <span>Bảng xếp hạng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="help.html" class="nav-link">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor" d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path fill="currentColor" d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-1.01 1.16-.408.133-.958.304-1.01.832-.01.178.03.347.102.446a.25.25 0 0 0 .192.14h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927-1.01-1.16-.408.133-.958.304-1.01.832-.01.178.03.347.102.446a.25.25 0 0 0 .192.14H6.5a.25.25 0 0 0-.25.25v.105c0 .718-.273.927-1.01 1.16-.408.133-.958.304-1.01.832-.01.178.03.347.102.446a.25.25 0 0 0 .192.14h.811a.25.25 0 0 0 .25-.25v-.105z"/>
+                    </svg>
+                    <span>Trợ giúp</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" id="logoutLink">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M6 12c0 .55.45 1 1 1s1-.45 1-1V7h2c.55 0 1-.45 1-1s-.45-1-1-1H8V2c0-.55-.45-1-1-1s-1 .45-1 1v3H4c-.55 0-1 .45-1 1s.45 1 1 1h2v5z" />
+                    </svg>
+                    <span>Đăng xuất</span>
                 </a>
             </li>
         </ul>

@@ -1,4 +1,6 @@
-const QUẤT_MONEY = 1000000000; // Số dư khởi tạo, thay đổi tại đây
+const QUẤT_MONEY = 100000; // Số dư khởi tạo, thay đổi tại đây
+const API_BASE = '/api';
+
 class BomWinGame {
     constructor() {
         this.balance = QUẤT_MONEY;
@@ -11,11 +13,17 @@ class BomWinGame {
         this.maxStreak = 0;
         this.history = [];
         this.lastBetFormat = ''; // Lưu format gốc của người dùng (10%, 1k, etc.)
+        this.token = localStorage.getItem('quatwin_token');
+        this.user = JSON.parse(localStorage.getItem('quatwin_user') || '{}');
+
+        // Check authentication
+        if (!this.token) {
+            window.location.href = '/login.html';
+            return;
+        }
 
         this.initializeElements();
-        this.loadGameData();
-        this.updateDisplay();
-        this.updateChoiceColors();
+        this.initGame();
 
         // Đồng bộ kích thước hai ô kết quả (trái/phải)
         this.syncDicePanels();
@@ -44,10 +52,11 @@ class BomWinGame {
         this.taiBtn = document.getElementById('taiBtn');
         this.xiuBtn = document.getElementById('xiuBtn');
         this.playBtn = document.getElementById('playBtn');
-        this.resetBtn = document.getElementById('resetBtn');
+        // Reset button removed - Admin can manage data directly
         this.historyToggle = document.getElementById('historyToggle');
         this.historyPopup = document.getElementById('historyPopup');
         this.historyClose = document.getElementById('historyClose');
+        this.logoutLink = document.getElementById('logoutLink');
         this.alertPopup = document.getElementById('alertPopup');
         this.alertMessage = document.getElementById('alertMessage');
         this.alertClose = document.getElementById('alertClose');
@@ -69,52 +78,80 @@ class BomWinGame {
         this.xiuRateEl = document.getElementById('xiuRate');
         this.historyListEl = document.getElementById('historyListPopup');
 
-        this.betAmountEl.addEventListener('input', () => this.parseBetAmount());
-        this.taiBtn.addEventListener('click', () => this.selectChoice('tai'));
-        this.xiuBtn.addEventListener('click', () => this.selectChoice('xiu'));
-        this.playBtn.addEventListener('click', () => this.play());
-        this.resetBtn.addEventListener('click', () => this.resetGame());
-        this.historyToggle.addEventListener('click', () => this.showHistory());
-        this.historyClose.addEventListener('click', () => this.hideHistory());
-        this.historyPopup.addEventListener('click', (e) => {
-            if (e.target === this.historyPopup) {
-                this.hideHistory();
-            }
-        });
-        this.alertClose.addEventListener('click', () => this.hideAlert());
-        this.alertPopup.addEventListener('click', (e) => {
-            if (e.target === this.alertPopup) {
-                this.hideAlert();
-            }
-        });
-        this.confirmYes.addEventListener('click', () => this.confirmCallback(true));
-        this.confirmNo.addEventListener('click', () => this.confirmCallback(false));
-        this.confirmPopup.addEventListener('click', (e) => {
-            if (e.target === this.confirmPopup) {
-                this.confirmCallback(false);
-            }
-        });
+        // Add event listeners with null checks
+        if (this.betAmountEl) {
+            this.betAmountEl.addEventListener('input', () => this.parseBetAmount());
+        }
+        if (this.taiBtn) {
+            this.taiBtn.addEventListener('click', () => this.selectChoice('tai'));
+        }
+        if (this.xiuBtn) {
+            this.xiuBtn.addEventListener('click', () => this.selectChoice('xiu'));
+        }
+        if (this.playBtn) {
+            this.playBtn.addEventListener('click', () => this.play());
+        }
+        if (this.historyToggle) {
+            this.historyToggle.addEventListener('click', () => this.showHistory());
+        }
+        if (this.historyClose) {
+            this.historyClose.addEventListener('click', () => this.hideHistory());
+        }
+        if (this.logoutLink) {
+            this.logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.logout();
+            });
+        }
+        if (this.historyPopup) {
+            this.historyPopup.addEventListener('click', (e) => {
+                if (e.target === this.historyPopup) {
+                    this.hideHistory();
+                }
+            });
+        }
+        if (this.alertClose) {
+            this.alertClose.addEventListener('click', () => this.hideAlert());
+        }
+        if (this.alertPopup) {
+            this.alertPopup.addEventListener('click', (e) => {
+                if (e.target === this.alertPopup) {
+                    this.hideAlert();
+                }
+            });
+        }
+        if (this.confirmYes) {
+            this.confirmYes.addEventListener('click', () => this.confirmCallback(true));
+        }
+        if (this.confirmNo) {
+            this.confirmNo.addEventListener('click', () => this.confirmCallback(false));
+        }
+        if (this.confirmPopup) {
+            this.confirmPopup.addEventListener('click', (e) => {
+                if (e.target === this.confirmPopup) {
+                    this.confirmCallback(false);
+                }
+            });
+        }
 
         // Sidebar navigation event listeners
-        document.getElementById('gameLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.setActiveNavItem('gameLink');
-        });
-        document.getElementById('statsLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.setActiveNavItem('statsLink');
-            window.location.href = 'html/stats.html';
-        });
-        document.getElementById('settingsLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.setActiveNavItem('settingsLink');
-            this.showSettings();
-        });
-        document.getElementById('helpLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.setActiveNavItem('helpLink');
-            this.showHelp();
-        });
+        const gameLink = document.getElementById('gameLink');
+        if (gameLink) {
+            gameLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setActiveNavItem('gameLink');
+            });
+        }
+
+        const statsLink = document.getElementById('statsLink');
+        if (statsLink) {
+            statsLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setActiveNavItem('statsLink');
+                window.location.href = 'html/stats.html';
+            });
+        }
+
 
         // Khi ảnh xúc xắc tải xong, đồng bộ lại chiều cao
         ['d1','d2','d3'].forEach(id => {
@@ -250,58 +287,7 @@ class BomWinGame {
         }
     }
 
-    resetGame() {
-                this.showConfirm('Bạn có chắc muốn reset game? Tất cả dữ liệu sẽ bị xóa!', '🔄', (confirmed) => {
-            this.hideConfirm();
-            if (confirmed) {
-                // Reset tất cả dữ liệu
-                this.balance = QUẤT_MONEY;
-                this.currentBet = 0;
-                this.selectedChoice = null;
-                this.totalGames = 0;
-                this.totalWins = 0;
-                this.totalProfit = 0;
-                this.currentStreak = 0;
-                this.maxStreak = 0;
-                this.history = [];
-                this.lastBetFormat = '';
-
-                // Reset UI
-                if (this.betAmountEl) {
-                    this.betAmountEl.value = '';
-                }
-                this.taiBtn.classList.remove('selected');
-                this.xiuBtn.classList.remove('selected');
-                this.playBtn.disabled = true;
-                this.playBtn.textContent = '🎲 Chọn cửa để chơi';
-                // Giữ khung hiển thị, ẩn ảnh để không vỡ layout
-                this.diceResultEl.style.display = 'block';
-                if (this.diceNumbersEl && !this.diceNumbersEl.classList.contains('hidden-dice')) {
-                    this.diceNumbersEl.classList.add('hidden-dice');
-                }
-                if (this.diceSumEl) {
-                    this.diceSumEl.innerHTML = '';
-                }
-                if (this.resultEl) {
-                    this.resultEl.textContent = 'Chọn cửa Tài hoặc Xỉu để bắt đầu!';
-                    this.resultEl.className = 'result';
-                }
-
-                // Cập nhật hiển thị
-                this.updateDisplay();
-                this.updateHistory();
-                this.updateChoiceColors();
-                this.updateTaiXiuRate();
-
-                // Xóa dữ liệu localStorage
-                localStorage.removeItem('bomwinGameData');
-
-                this.showAlert('Game đã được reset!', '✅');
-                // Reset nút play state
-                this._rolling = false;
-            }
-        });
-    }
+    // Reset functionality removed - Admin can manage data directly
 
     play() {
         if (this.currentBet > this.balance) {
@@ -464,6 +450,12 @@ class BomWinGame {
         this.updateBetIfPercent();
 
         this.saveGameData();
+        
+        // Reload stats from server after game
+        this.loadStats().then(() => {
+            this.updateDisplay();
+            this.updateChoiceColors();
+        });
 
         // Hiệu ứng (nếu có phần tử result)
         if (this.resultEl) {
@@ -641,22 +633,37 @@ class BomWinGame {
 
     updateTaiXiuRate() {
         if (!this.taiRateEl || !this.xiuRateEl) return;
-        const total = this.history.length;
+        
+        // Use server data if available, otherwise calculate from history
+        let taiRate, xiuRate, taiCount, xiuCount;
+        
+        if (this.taiRate !== undefined && this.xiuRate !== undefined) {
+            // Use server data
+            taiRate = this.taiRate;
+            xiuRate = this.xiuRate;
+            taiCount = this.taiCount || 0;
+            xiuCount = this.xiuCount || 0;
+        } else {
+            // Fallback to local calculation
+            const total = this.history.length;
+            if (total === 0) {
+                taiRate = 0;
+                xiuRate = 0;
+                taiCount = 0;
+                xiuCount = 0;
+            } else {
+                taiCount = 0;
+                xiuCount = 0;
+                this.history.forEach(h => { if (Number(h.sum) >= 11) taiCount++; else xiuCount++; });
+                taiRate = ((taiCount / total) * 100).toFixed(1);
+                xiuRate = ((xiuCount / total) * 100).toFixed(1);
+            }
+        }
+        
         // reset màu
         this.taiRateEl.classList.remove('rate-green','rate-red','rate-yellow');
         this.xiuRateEl.classList.remove('rate-green','rate-red','rate-yellow');
-        if (total === 0) {
-            this.taiRateEl.textContent = 'Tài: 0% (0 lần)';
-            this.xiuRateEl.textContent = 'Xỉu: 0% (0 lần)';
-            this.taiRateEl.classList.add('rate-yellow');
-            this.xiuRateEl.classList.add('rate-yellow');
-            return;
-        }
-        let taiCount = 0;
-        let xiuCount = 0;
-        this.history.forEach(h => { if (Number(h.sum) >= 11) taiCount++; else xiuCount++; });
-        const taiRate = ((taiCount / total) * 100).toFixed(1);
-        const xiuRate = ((xiuCount / total) * 100).toFixed(1);
+        
         this.taiRateEl.textContent = `Tài: ${taiRate}% (${taiCount} lần)`;
         this.xiuRateEl.textContent = `Xỉu: ${xiuRate}% (${xiuCount} lần)`;
 
@@ -674,20 +681,31 @@ class BomWinGame {
 
     // Cập nhật màu TÀI/XỈU theo tần suất xuất hiện trong lịch sử
     updateChoiceColors() {
-        const total = this.history.length;
         if (!this.taiBtn || !this.xiuBtn) return;
+        
         // reset
         this.taiBtn.classList.remove('btn-green','btn-red','btn-yellow');
         this.xiuBtn.classList.remove('btn-green','btn-red','btn-yellow');
 
-        if (total === 0) {
-            this.taiBtn.classList.add('btn-yellow');
-            this.xiuBtn.classList.add('btn-yellow');
-            return;
+        // Use server data if available, otherwise calculate from history
+        let taiCount, xiuCount;
+        
+        if (this.taiCount !== undefined && this.xiuCount !== undefined) {
+            // Use server data
+            taiCount = this.taiCount;
+            xiuCount = this.xiuCount;
+        } else {
+            // Fallback to local calculation
+            const total = this.history.length;
+            if (total === 0) {
+                this.taiBtn.classList.add('btn-yellow');
+                this.xiuBtn.classList.add('btn-yellow');
+                return;
+            }
+            taiCount = 0;
+            xiuCount = 0;
+            this.history.forEach(h => { if (Number(h.sum) >= 11) taiCount++; else xiuCount++; });
         }
-        let taiCount = 0;
-        let xiuCount = 0;
-        this.history.forEach(h => { if (Number(h.sum) >= 11) taiCount++; else xiuCount++; });
 
         if (taiCount > xiuCount) {
             this.taiBtn.classList.add('btn-green');
@@ -701,27 +719,46 @@ class BomWinGame {
         }
     }
 
-    saveGameData() {
-        const gameData = {
-            balance: this.balance,
-            totalGames: this.totalGames,
-            totalWins: this.totalWins,
-            totalProfit: this.totalProfit,
-            currentStreak: this.currentStreak,
-            maxStreak: this.maxStreak,
-            history: this.history,
-            lastBetFormat: this.lastBetFormat,
-            lastPlayed: new Date().toISOString()
-        };
+    async saveGameData() {
+        try {
+            const gameData = {
+                balance: this.balance,
+                totalGames: this.totalGames,
+                totalWins: this.totalWins,
+                totalProfit: this.totalProfit,
+                currentStreak: this.currentStreak,
+                maxStreak: this.maxStreak,
+                history: this.history,
+                lastBetFormat: this.lastBetFormat
+            };
 
-        localStorage.setItem('bomwinGameData', JSON.stringify(gameData));
+            const response = await fetch(`${API_BASE}/save-game`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify(gameData)
+            });
+
+            if (!response.ok) {
+                console.error('Failed to save game data');
+            }
+        } catch (error) {
+            console.error('Error saving game data:', error);
+        }
     }
 
-    loadGameData() {
-        const savedData = localStorage.getItem('bomwinGameData');
-        if (savedData) {
-            try {
-                const gameData = JSON.parse(savedData);
+    async loadGameData() {
+        try {
+            const response = await fetch(`${API_BASE}/load-game`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (response.ok) {
+                const gameData = await response.json();
                 this.balance = gameData.balance !== undefined ? gameData.balance : QUẤT_MONEY;
                 this.totalGames = gameData.totalGames || 0;
                 this.totalWins = gameData.totalWins || 0;
@@ -736,12 +773,51 @@ class BomWinGame {
                     this.betAmountEl.value = this.lastBetFormat;
                     this.parseBetAmount();
                 }
-            } catch (e) {
-                console.log('Không thể load dữ liệu game');
+            } else if (response.status === 401) {
+                // Token expired, redirect to login
+                localStorage.removeItem('quatwin_token');
+                localStorage.removeItem('quatwin_user');
+                window.location.href = '/login.html';
             }
+        } catch (error) {
+            console.error('Error loading game data:', error);
         }
     }
 
+    async initGame() {
+        await this.loadGameData();
+        await this.loadStats();
+        this.updateDisplay();
+        this.updateChoiceColors();
+    }
+
+    async loadStats() {
+        try {
+            const response = await fetch(`${API_BASE}/stats`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (response.ok) {
+                const stats = await response.json();
+                this.balance = stats.balance;
+                this.totalGames = stats.totalGames;
+                this.totalWins = stats.totalWins;
+                this.totalProfit = stats.totalProfit;
+                this.currentStreak = stats.currentStreak;
+                this.maxStreak = stats.maxStreak;
+                
+                // Update Tai/Xiu rates from server
+                this.taiRate = stats.taiRate;
+                this.xiuRate = stats.xiuRate;
+                this.taiCount = stats.taiCount;
+                this.xiuCount = stats.xiuCount;
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
 
     showHistory() {
         this.historyPopup.classList.add('show');
@@ -795,19 +871,32 @@ class BomWinGame {
             'Các tính năng này sẽ được cập nhật trong phiên bản tiếp theo!', '⚙️');
     }
 
-    showHelp() {
-        this.showAlert('❓ Trợ giúp\n\n' +
-            '🎯 Cách chơi:\n' +
-            '• Chọn Tài (11-18) hoặc Xỉu (3-10)\n' +
-            '• Nhập số tiền cược\n' +
-            '• Nhấn "Tung xúc sắc"\n\n' +
-            '💰 Cách cược:\n' +
-            '• Số: 1000, 5000\n' +
-            '• K/M/B: 1k, 2m, 3b\n' +
-            '• Phần trăm: 20%, 50%\n\n' +
-            '🎁 Phần thưởng:\n' +
-            '• Thắng thường: x1\n' +
-            '• Trùng số: x3', '❓');
+
+    logout() {
+        this.showLogoutConfirm();
+    }
+
+    showLogoutConfirm() {
+        const popup = document.getElementById('logoutPopup');
+        if (popup) {
+            popup.style.display = 'flex';
+            
+            popup.querySelector('.logout-cancel').addEventListener('click', () => {
+                popup.style.display = 'none';
+            });
+            
+            popup.querySelector('.logout-confirm').addEventListener('click', () => {
+                localStorage.removeItem('quatwin_token');
+                localStorage.removeItem('quatwin_user');
+                window.location.href = '/login.html';
+            });
+            
+            popup.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.style.display = 'none';
+                }
+            });
+        }
     }
 }
 

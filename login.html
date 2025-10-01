@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuấtWin - Đăng nhập</title>
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        .login-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            margin: 0 auto;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .login-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: bold;
+            color: var(--text-strong);
+            font-size: 1.1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid var(--glass-border);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-strong);
+            font-size: 1.3rem;
+            font-weight: 500;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+        }
+
+        /* Fix autocomplete suggestions styling */
+        .form-input:-webkit-autofill,
+        .form-input:-webkit-autofill:hover,
+        .form-input:-webkit-autofill:focus,
+        .form-input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
+            -webkit-text-fill-color: var(--text-strong) !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 2px solid var(--glass-border) !important;
+        }
+
+        /* Remove white background on hover/click */
+        .form-input:hover,
+        .form-input:active,
+        .form-input:focus {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: #4ecdc4 !important;
+        }
+
+        /* Override any browser default styling */
+        .form-input {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: var(--text-strong) !important;
+        }
+
+        /* Style for autocomplete dropdown */
+        input[list] {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom styling for datalist options */
+        datalist {
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: var(--text-strong);
+        }
+
+        /* Style autocomplete dropdown */
+        .form-input::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        /* Override any browser autocomplete styling */
+        .form-input:-webkit-autofill,
+        .form-input:-webkit-autofill:hover,
+        .form-input:-webkit-autofill:focus,
+        .form-input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important;
+            -webkit-text-fill-color: var(--text-strong) !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 2px solid var(--glass-border) !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+        }
+
+        /* Override browser default autocomplete styling */
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Force remove any white background */
+        .form-input:not(:focus):not(:hover):not(:active) {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Ensure consistent styling across all states */
+        .form-input,
+        .form-input:focus,
+        .form-input:hover,
+        .form-input:active,
+        .form-input:visited {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: var(--text-strong) !important;
+            border: 2px solid var(--glass-border) !important;
+        }
+
+        /* Override any browser suggestions styling */
+        .form-input::-webkit-input-placeholder,
+        .form-input::-moz-placeholder,
+        .form-input:-ms-input-placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #cfe8ff;
+            cursor: pointer;
+            font-size: 1.4rem;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle:hover {
+            color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .password-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #44a08d, #4ecdc4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-strong);
+            border: 2px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #4ecdc4;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .form-toggle {
+            margin-top: 20px;
+            color: var(--text-soft);
+        }
+
+        .form-toggle a {
+            color: #4ecdc4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .form-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: none;
+            color: var(--text-soft);
+        }
+
+        .forgot-password-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .forgot-password-popup.show {
+            display: flex;
+        }
+
+        .forgot-password-content {
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .forgot-password-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        .forgot-password-message {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: var(--text-soft);
+            line-height: 1.6;
+        }
+
+        .contact-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .contact-item a {
+            color: #4ecdc4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        .close-forgot-popup {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .close-forgot-popup:hover {
+            background: linear-gradient(45deg, #44a08d, #4ecdc4);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="login-title">🎲 QuấtWin</h1>
+        
+        <!-- Login Form -->
+        <form id="loginForm" style="display: block;">
+            <h2 style="margin-bottom: 30px; color: var(--text-strong);">Đăng nhập</h2>
+            
+            <div class="form-group">
+                <label for="loginUsername">Tên đăng nhập:</label>
+                <input type="text" id="loginUsername" class="form-input" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="loginPassword">Mật khẩu:</label>
+                <div style="position: relative;">
+                    <input type="password" id="loginPassword" class="form-input" required style="padding-right: 60px;" autocomplete="current-password">
+                    <button type="button" id="toggleLoginPassword" class="password-toggle">👁️</button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+            <div class="loading" id="loginLoading">Đang đăng nhập...</div>
+            <div class="error-message" id="loginError"></div>
+            
+            <div class="form-toggle">
+                Chưa có tài khoản? <a href="#" id="showRegister">Đăng ký ngay</a>
+            </div>
+        </form>
+
+        <!-- Forgot Password Popup -->
+        <div id="forgotPasswordPopup" class="forgot-password-popup">
+            <div class="forgot-password-content">
+                <div class="forgot-password-title">🔐 Quên mật khẩu?</div>
+                <div class="forgot-password-message">
+                    Bạn đã nhập sai mật khẩu 3 lần liên tiếp. Nếu bạn quên mật khẩu, vui lòng liên hệ Admin để được hỗ trợ lấy lại mật khẩu.
+                </div>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📘 Facebook:</span>
+                        <a href="https://www.facebook.com/duyquocc2.6/" target="_blank">@duyquocc2.6</a>
+                    </div>
+                    <div class="contact-item">
+                        <span>📱 Zalo:</span>
+                        <a href="tel:0339182882">0339182882</a>
+                    </div>
+                </div>
+                <button class="close-forgot-popup" onclick="closeForgotPasswordPopup()">Đóng</button>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <form id="registerForm" style="display: none;">
+            <h2 style="margin-bottom: 30px; color: var(--text-strong);">Đăng ký</h2>
+            
+            <div class="form-group">
+                <label for="registerUsername">Tên đăng nhập:</label>
+                <input type="text" id="registerUsername" class="form-input" required minlength="3" autocomplete="new-username">
+            </div>
+            
+            <div class="form-group">
+                <label for="registerPassword">Mật khẩu:</label>
+                <div style="position: relative;">
+                    <input type="password" id="registerPassword" class="form-input" required minlength="6" style="padding-right: 60px;" autocomplete="new-password">
+                    <button type="button" id="toggleRegisterPassword" class="password-toggle">👁️</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Xác nhận mật khẩu:</label>
+                <div style="position: relative;">
+                    <input type="password" id="confirmPassword" class="form-input" required style="padding-right: 60px;" autocomplete="new-password">
+                    <button type="button" id="toggleConfirmPassword" class="password-toggle">👁️</button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Đăng ký</button>
+            <div class="loading" id="registerLoading">Đang đăng ký...</div>
+            <div class="error-message" id="registerError"></div>
+            <div class="success-message" id="registerSuccess"></div>
+            
+            <div class="form-toggle">
+                Đã có tài khoản? <a href="#" id="showLogin">Đăng nhập</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentToken = localStorage.getItem('quatwin_token');
+
+        // Check if already logged in
+        if (currentToken) {
+            window.location.href = '/';
+        }
+
+        // Form elements
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+
+        // Toggle forms
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            passwordAttempts = 0; // Reset counter when switching forms
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            clearMessages();
+        });
+
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            passwordAttempts = 0; // Reset counter when switching forms
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            clearMessages();
+        });
+
+        // Password attempt counter
+        let passwordAttempts = 0;
+        const maxAttempts = 3;
+
+        // Clear error messages
+        function clearMessages() {
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('registerError').textContent = '';
+            document.getElementById('registerSuccess').textContent = '';
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        // Add event listeners for password toggles
+        document.getElementById('toggleLoginPassword').addEventListener('click', () => {
+            togglePassword('loginPassword', 'toggleLoginPassword');
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
+            togglePassword('registerPassword', 'toggleRegisterPassword');
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', () => {
+            togglePassword('confirmPassword', 'toggleConfirmPassword');
+        });
+
+        // Forgot password popup functions
+        function showForgotPasswordPopup() {
+            document.getElementById('forgotPasswordPopup').classList.add('show');
+        }
+
+        function closeForgotPasswordPopup() {
+            document.getElementById('forgotPasswordPopup').classList.remove('show');
+            passwordAttempts = 0; // Reset counter when closing popup
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('forgotPasswordPopup').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('forgotPasswordPopup')) {
+                closeForgotPasswordPopup();
+            }
+        });
+
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const loginLoading = document.getElementById('loginLoading');
+            const loginError = document.getElementById('loginError');
+            
+            loginLoading.style.display = 'block';
+            loginError.textContent = '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Reset counter on successful login
+                    passwordAttempts = 0;
+                    localStorage.setItem('quatwin_token', data.token);
+                    localStorage.setItem('quatwin_user', JSON.stringify(data.user));
+                    window.location.href = '/';
+                } else {
+                    if (data.error && data.error.includes('Invalid username or password')) {
+                        passwordAttempts++;
+                        
+                        if (passwordAttempts >= maxAttempts) {
+                            showForgotPasswordPopup();
+                        } else {
+                            const remainingAttempts = maxAttempts - passwordAttempts;
+                            loginError.textContent = `Sai tên đăng nhập hoặc mật khẩu! Còn ${remainingAttempts} lần thử.`;
+                        }
+                    } else {
+                        loginError.textContent = data.error || 'Đăng nhập thất bại';
+                    }
+                }
+            } catch (error) {
+                loginError.textContent = 'Lỗi kết nối. Vui lòng thử lại.';
+            } finally {
+                loginLoading.style.display = 'none';
+            }
+        });
+
+        // Register form submission
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            const registerLoading = document.getElementById('registerLoading');
+            const registerError = document.getElementById('registerError');
+            const registerSuccess = document.getElementById('registerSuccess');
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                registerError.textContent = 'Mật khẩu xác nhận không khớp';
+                return;
+            }
+            
+            registerLoading.style.display = 'block';
+            registerError.textContent = '';
+            registerSuccess.textContent = '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    registerSuccess.textContent = 'Đăng ký thành công! Đang chuyển hướng...';
+                    localStorage.setItem('quatwin_token', data.token);
+                    localStorage.setItem('quatwin_user', JSON.stringify(data.user));
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                } else {
+                    registerError.textContent = data.error || 'Đăng ký thất bại';
+                }
+            } catch (error) {
+                registerError.textContent = 'Lỗi kết nối. Vui lòng thử lại.';
+            } finally {
+                registerLoading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

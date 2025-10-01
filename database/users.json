@@ -1,0 +1,16 @@
+[
+  {
+    "id": "fb3b111f-327e-4dc3-973c-4d92ec5abae4",
+    "username": "quất cute",
+    "password": "okioki",
+    "balance": 247867572,
+    "totalGames": 29,
+    "totalWins": 10,
+    "totalProfit": -752132428,
+    "currentStreak": 2,
+    "maxStreak": 2,
+    "createdAt": "2025-10-01T04:28:39.434Z",
+    "lastBetFormat": "100%",
+    "lastPlayed": "2025-10-01T05:38:46.974Z"
+  }
+]
