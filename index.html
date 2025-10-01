@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuấtWin</title>
+    <style>
+        @import url('css/index.css');
+
+        /* Center main game and match stats background */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0 !important;
+        }
+
+        body>.game-container {
+            margin: auto;
+        }
+
+        .game-container {
+            width: 980px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.22), rgba(255, 255, 255, 0.06));
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(4px);
+            min-height: 640px;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2.4rem;
+        }
+
+        .game-area,
+        .bet-help {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* stats as 2x2 grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            width: 100%;
+            max-width: 980px;
+            margin: 20px auto 0;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #FFD700;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            color: #cfe8ff;
+            margin-top: 6px;
+        }
+
+        .bet-controls {
+            justify-content: center;
+        }
+
+        .dice-options {
+            justify-content: center;
+        }
+
+        .game-buttons {
+            justify-content: center;
+        }
+
+        .result {
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ensure sidebar trigger stays above */
+        #menuTriggerLogo {
+            z-index: 1100;
+        }
+
+        /* Dice images layout */
+        #diceNumbers {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 0 6px;
+            line-height: 0; /* loại bỏ khoảng trống baseline dưới ảnh */
+        }
+
+        /* mỗi viên chiếm đúng 1/3 trừ 2 khoảng gap để mép ngoài sát hơn */
+        .dice-img {
+            width: calc((100% - 24px) / 3);
+            height: auto;
+            max-height: 140px;
+            object-fit: contain;
+            display: block; /* tránh khoảng trống dưới ảnh (baseline) */
+            vertical-align: top;
+        }
+
+        /* Bring dice closer to the panel border */
+        .dice-result {
+            padding: 4px 6px !important;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06));
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            box-sizing: border-box;
+            min-height: 200px;
+            margin-bottom: 1px;
+        }
+
+        .info-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Làm #diceInfo và #diceNumbers có cùng width/height */
+        #diceRow {
+            align-items: stretch !important;
+        }
+
+        #diceResult {
+            display: flex;
+            align-items: center;
+        }
+
+        #diceNumbers {
+            height: 100%;
+        }
+        /* Ẩn xúc xắc khi mới vào nhưng vẫn giữ không gian */
+        #diceNumbers.hidden-dice .dice-img { visibility: hidden; }
+
+        #diceInfo {
+            height: 100%;
+        }
+
+        /* Trang trí kết quả bên trái (dice info) - đơn giản, dễ đọc */
+        #diceSum {
+            width: 100%;
+            font-family: inherit;
+            color: #f4f7ff;
+            font-size: 2.2rem;
+            line-height: 1.55;
+            padding-right: 8px;
+        }
+        #diceSum > div { margin: 8px 0; }
+        #diceSum .headline {
+            text-align: center;
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: inherit;
+            display: block;
+            width: fit-content;
+            margin: 0 auto 6px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        #diceSum .line { font-size: 2.0rem; padding-left: 15%; color: #cfe8ff; }
+        #diceSum .line + .line { border-top: 1px solid rgba(207,232,255,0.25); padding-top: 10px; }
+        #diceSum strong { color: #a8d4ff; font-weight: 700; }
+        #diceSum .money { font-size: 2.2rem; font-weight: 800; text-shadow: 0 1px 0 rgba(0,0,0,0.3); }
+        #diceSum .win-text { color: #4CAF50; font-weight: 700; }
+        #diceSum .lose-text { color: #f44336; font-weight: 700; }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <img id="menuTriggerLogo" src="stream/logo.png" alt="logo" />
+    <nav class="sidebar-nav hidden">
+        <div class="logo">
+            <h1>QuấtWin</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active">
+                <a href="#" class="nav-link" id="gameLink">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" />
+                        <circle cx="5" cy="8" r="1" />
+                        <circle cx="8" cy="8" r="1" />
+                        <circle cx="11" cy="8" r="1" />
+                    </svg>
+                    <span>Trò chơi</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" id="statsLink">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M0 0h16v16H0V0zm1 1v14h14V1H1zm2 2h10v1H3V3zm0 2h10v1H3V5zm0 2h7v1H3V7zm0 2h5v1H3V9z" />
+                    </svg>
+                    <span>Thống kê</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" id="settingsLink">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" />
+                        <path fill="currentColor"
+                            d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z" />
+                    </svg>
+                    <span>Cài đặt</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" id="helpLink">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                        <path fill="currentColor"
+                            d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-1.01 1.16-.408.133-.958.304-1.01.832-.01.178.03.347.102.446a.25.25 0 0 0 .192.14h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.16.408-.133.958-.304 1.01-.832.01-.178-.03-.347-.102-.446a.25.25 0 0 0-.192-.14H6.5a.25.25 0 0 0-.25.25v.105c0 .718-.273.927-1.01 1.16-.408.133-.958.304-1.01.832-.01.178.03.347.102.446a.25.25 0 0 0 .192.14h.811a.25.25 0 0 0 .25-.25v-.105z" />
+                    </svg>
+                    <span>Trợ giúp</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="top-right">
+        <div class="balance-display" id="balanceDisplay">💰 1,000 VND</div>
+        <button id="historyToggle" class="history-toggle">📊 Lịch sử</button>
+    </div>
+
+    <!-- Popup thông báo -->
+    <div id="alertPopup" class="alert-popup">
+        <div class="alert-content">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-message" id="alertMessage">Thông báo</div>
+            <button id="alertClose" class="alert-close">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Popup xác nhận -->
+    <div id="confirmPopup" class="alert-popup">
+        <div class="alert-content">
+            <div class="alert-icon">❓</div>
+            <div class="alert-message" id="confirmMessage">Bạn có chắc chắn?</div>
+            <div class="confirm-buttons">
+                <button id="confirmYes" class="confirm-btn confirm-yes">Có</button>
+                <button id="confirmNo" class="confirm-btn confirm-no">Không</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup lịch sử -->
+    <div id="historyPopup" class="history-popup">
+        <div class="history-content">
+            <div class="history-header-bar">
+                <button id="historyClose" class="history-close">✕</button>
+                <h3 class="history-title">📊 Lịch sử chơi</h3>
+            </div>
+            <div class="history-summary">
+                <span id="historyWinrate">Tỉ lệ thắng: 0% (0/0)</span>
+            </div>
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Phiên</th>
+                            <th>Thời gian</th>
+                            <th>Tổng cược</th>
+                            <th>Tiền thắng</th>
+                            <th>Chi tiết chơi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyListPopup">
+                    </tbody>
+                </table>
+            </div>
+            <div class="history-footer">
+                <button id="resetBtn" class="reset-btn">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="logo" id="mainLogo"></div>
+
+        <div class="game-area">
+            <div class="bet-controls">
+                <input type="text" id="betAmount" class="bet-input" placeholder="Nhập số tiền cược (100, 20k, 50%, 1m)">
+            </div>
+
+            <div class="dice-selection">
+                <div class="dice-options">
+                    <button id="taiBtn" class="dice-btn tai">TÀI</button>
+                    <button id="xiuBtn" class="dice-btn xiu">XỈU</button>
+                </div>
+            </div>
+
+            <div class="game-buttons">
+                <button id="playBtn" class="game-btn play-btn" disabled>🎲 Chọn cửa để chơi</button>
+            </div>
+
+            <!-- Hàng kết quả: chữ bên trái, xúc xắc bên phải -->
+            <div id="diceRow" class="dice-row"
+                style="display:flex; align-items:center; justify-content:space-between; gap:16px; width:100%; margin: 6px 0 16px 0;">
+                <div id="diceInfo" class="dice-result info-panel" style="flex:1;">
+                    <div id="diceSum" style="width:100%;"></div>
+                </div>
+                <div id="diceResult" class="dice-result" style="display:block; flex:1;">
+                    <div id="diceNumbers" class="hidden-dice">
+                        <img class="dice-img" id="d1" src="stream/1.png" alt="dice1">
+                        <img class="dice-img" id="d2" src="stream/1.png" alt="dice2">
+                        <img class="dice-img" id="d3" src="stream/1.png" alt="dice3">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalGames">0</div>
+                <div class="stat-label">Lượt chơi</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalWins">0</div>
+                <div class="stat-label">Thắng</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label" id="taiRate">Tài: 0% (0 lần)</div>
+                <div class="stat-label" id="xiuRate" style="margin-top:8px;">Xỉu: 0% (0 lần)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalProfit">0</div>
+                <div class="stat-label" id="totalProfitLabel">Lãi/Lỗ</div>
+            </div>
+        </div>
+
+    </div>
+    <script src="js/index.js"></script>
+</body>
+
+</html>

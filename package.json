@@ -1,0 +1,16 @@
+{
+  "name": "quatwin-tai-xiu-game",
+  "version": "1.0.0",
+  "description": "Game Tài Xỉu QuấtWin - Game cờ bạc trực tuyến",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 3000",
+    "build": "echo 'No build step needed for static site'"
+  },
+  "keywords": ["game", "tai-xiu", "dice", "gambling", "vietnam"],
+  "author": "QuấtWin",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
