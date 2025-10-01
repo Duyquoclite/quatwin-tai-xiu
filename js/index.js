@@ -80,22 +80,22 @@ class BomWinGame {
 
         // Add event listeners with null checks
         if (this.betAmountEl) {
-            this.betAmountEl.addEventListener('input', () => this.parseBetAmount());
+        this.betAmountEl.addEventListener('input', () => this.parseBetAmount());
         }
         if (this.taiBtn) {
-            this.taiBtn.addEventListener('click', () => this.selectChoice('tai'));
+        this.taiBtn.addEventListener('click', () => this.selectChoice('tai'));
         }
         if (this.xiuBtn) {
-            this.xiuBtn.addEventListener('click', () => this.selectChoice('xiu'));
+        this.xiuBtn.addEventListener('click', () => this.selectChoice('xiu'));
         }
         if (this.playBtn) {
-            this.playBtn.addEventListener('click', () => this.play());
+        this.playBtn.addEventListener('click', () => this.play());
         }
         if (this.historyToggle) {
-            this.historyToggle.addEventListener('click', () => this.showHistory());
+        this.historyToggle.addEventListener('click', () => this.showHistory());
         }
         if (this.historyClose) {
-            this.historyClose.addEventListener('click', () => this.hideHistory());
+        this.historyClose.addEventListener('click', () => this.hideHistory());
         }
         if (this.logoutLink) {
             this.logoutLink.addEventListener('click', (e) => {
@@ -104,52 +104,52 @@ class BomWinGame {
             });
         }
         if (this.historyPopup) {
-            this.historyPopup.addEventListener('click', (e) => {
-                if (e.target === this.historyPopup) {
-                    this.hideHistory();
-                }
-            });
+        this.historyPopup.addEventListener('click', (e) => {
+            if (e.target === this.historyPopup) {
+                this.hideHistory();
+            }
+        });
         }
         if (this.alertClose) {
-            this.alertClose.addEventListener('click', () => this.hideAlert());
+        this.alertClose.addEventListener('click', () => this.hideAlert());
         }
         if (this.alertPopup) {
-            this.alertPopup.addEventListener('click', (e) => {
-                if (e.target === this.alertPopup) {
-                    this.hideAlert();
-                }
-            });
+        this.alertPopup.addEventListener('click', (e) => {
+            if (e.target === this.alertPopup) {
+                this.hideAlert();
+            }
+        });
         }
         if (this.confirmYes) {
-            this.confirmYes.addEventListener('click', () => this.confirmCallback(true));
+        this.confirmYes.addEventListener('click', () => this.confirmCallback(true));
         }
         if (this.confirmNo) {
-            this.confirmNo.addEventListener('click', () => this.confirmCallback(false));
+        this.confirmNo.addEventListener('click', () => this.confirmCallback(false));
         }
         if (this.confirmPopup) {
-            this.confirmPopup.addEventListener('click', (e) => {
-                if (e.target === this.confirmPopup) {
-                    this.confirmCallback(false);
-                }
-            });
+        this.confirmPopup.addEventListener('click', (e) => {
+            if (e.target === this.confirmPopup) {
+                this.confirmCallback(false);
+            }
+        });
         }
 
         // Sidebar navigation event listeners
         const gameLink = document.getElementById('gameLink');
         if (gameLink) {
             gameLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.setActiveNavItem('gameLink');
-            });
+            e.preventDefault();
+            this.setActiveNavItem('gameLink');
+        });
         }
 
         const statsLink = document.getElementById('statsLink');
         if (statsLink) {
             statsLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.setActiveNavItem('statsLink');
-                window.location.href = 'html/stats.html';
-            });
+            e.preventDefault();
+            this.setActiveNavItem('statsLink');
+            window.location.href = 'html/stats.html';
+        });
         }
 
 
@@ -645,7 +645,7 @@ class BomWinGame {
             xiuCount = this.xiuCount || 0;
         } else {
             // Fallback to local calculation
-            const total = this.history.length;
+        const total = this.history.length;
             if (total === 0) {
                 taiRate = 0;
                 xiuRate = 0;
@@ -697,14 +697,14 @@ class BomWinGame {
         } else {
             // Fallback to local calculation
             const total = this.history.length;
-            if (total === 0) {
-                this.taiBtn.classList.add('btn-yellow');
-                this.xiuBtn.classList.add('btn-yellow');
-                return;
-            }
+        if (total === 0) {
+            this.taiBtn.classList.add('btn-yellow');
+            this.xiuBtn.classList.add('btn-yellow');
+            return;
+        }
             taiCount = 0;
             xiuCount = 0;
-            this.history.forEach(h => { if (Number(h.sum) >= 11) taiCount++; else xiuCount++; });
+        this.history.forEach(h => { if (Number(h.sum) >= 11) taiCount++; else xiuCount++; });
         }
 
         if (taiCount > xiuCount) {
@@ -721,14 +721,14 @@ class BomWinGame {
 
     async saveGameData() {
         try {
-            const gameData = {
-                balance: this.balance,
-                totalGames: this.totalGames,
-                totalWins: this.totalWins,
-                totalProfit: this.totalProfit,
-                currentStreak: this.currentStreak,
-                maxStreak: this.maxStreak,
-                history: this.history,
+        const gameData = {
+            balance: this.balance,
+            totalGames: this.totalGames,
+            totalWins: this.totalWins,
+            totalProfit: this.totalProfit,
+            currentStreak: this.currentStreak,
+            maxStreak: this.maxStreak,
+            history: this.history,
                 lastBetFormat: this.lastBetFormat
             };
 

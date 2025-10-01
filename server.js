@@ -373,12 +373,16 @@ app.get('/', (req, res) => {
 // GET /api/leaderboard - Get leaderboard data
 app.get('/api/leaderboard', authenticateToken, async (req, res) => {
     try {
+        console.log('🔍 Leaderboard API called by user:', req.user.username);
         const users = readDB(USERS_DB);
+        console.log('📊 Total users in DB:', users.length);
         
         // Sort users by balance (descending)
         const sortedUsers = users
             .sort((a, b) => b.balance - a.balance)
             .slice(0, 50); // Top 50 players
+        
+        console.log('🏆 Top players:', sortedUsers.slice(0, 5).map(u => ({ username: u.username, balance: u.balance })));
         
         // Calculate totals
         const totalPlayers = users.length;
@@ -386,16 +390,26 @@ app.get('/api/leaderboard', authenticateToken, async (req, res) => {
         const totalWins = users.reduce((sum, user) => sum + user.totalWins, 0);
         const totalBalance = users.reduce((sum, user) => sum + user.balance, 0);
         
-        res.json({
+        const response = {
             players: sortedUsers,
             totalPlayers,
             totalGames,
             totalWins,
             totalBalance
+        };
+        
+        console.log('📤 Sending response:', { 
+            totalPlayers: response.totalPlayers, 
+            totalGames: response.totalGames,
+            totalWins: response.totalWins,
+            totalBalance: response.totalBalance,
+            playersCount: response.players.length
         });
         
+        res.json(response);
+        
     } catch (error) {
-        console.error('Leaderboard error:', error);
+        console.error('❌ Leaderboard error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
